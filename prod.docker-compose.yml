@@ -1,0 +1,39 @@
+version: "3.2"
+services:
+  zero:
+    image: dgraph/dgraph:latest
+    volumes:
+      - ./data:/dgraph
+    restart: on-failure
+    command: dgraph zero --my=zero:5080
+    networks:
+      - dgraph
+
+  alpha:
+    image: dgraph/dgraph:latest
+    privileged: true
+    volumes:
+      - ./data:/dgraph
+    ports:
+      - "8080:8080"
+      - "9080:9080"
+    restart: on-failure
+    command: dgraph alpha --my=alpha:7080 --zero=zero:5080 --security "whitelist=0.0.0.0/0" --lambda "docker-image=ghcr.io/schartey/dgraph-lambda-example:main; docker-registry=https://ghcr.io/;"
+    networks:
+      - dgraph
+
+  ratel:
+    image: dgraph/dgraph:v20.11.3
+    volumes:
+      - /tmp/data:/dgraph
+    ports:
+      - "8000:8000"
+    restart: on-failure
+    command: dgraph-ratel
+    networks:
+      - dgraph
+      
+networks:
+  dgraph:
+    driver: bridge
+    name: dgraph
