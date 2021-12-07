@@ -1,0 +1,14 @@
+type User @secret(field: "password") {
+    id: ID!
+    username: String! @id @search(by: [exact])
+    email: String! @id @search(by: [exact])
+}
+
+type Query {
+    firstUserDql: User @lambda
+}
+
+
+type Mutation {
+    newUserGraphql(name: String!): ID! @lambda
+}
